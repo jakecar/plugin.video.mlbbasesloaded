@@ -1,10 +1,11 @@
 import os
 import pickle
 import time
-from xbmcswift2 import xbmc, xbmcaddon
+from xbmcswift2 import xbmcaddon, xbmcgui
 import requests
 from utils import *
 from globals import *
+import sys
 
 class MlbTvSession():
     def __init__(self):

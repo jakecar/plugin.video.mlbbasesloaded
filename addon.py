@@ -1,16 +1,7 @@
-from xbmcswift2 import Plugin, actions
-from xbmcswift2 import xbmcgui, xbmc, xbmcaddon
+from xbmcswift2 import Plugin
+from xbmcswift2 import xbmc
 import mlb_player
-import requests
-import cookielib
-import urllib2
-import urllib
-import time
 import datetime
-import os
-import json
-import StorageServer
-import mlbtv_session
 import mlbtv_stream_api
 from utils import *
 import mlb_exceptions
@@ -29,7 +20,6 @@ def index():
 @plugin.route('/basesloaded')
 def play_basesloaded():
     import get_scores
-    import datetime
 
     li_csv_path =  plugin.addon.getAddonInfo('path') + "/resources/li.csv"
     # TODO be weary of timezone issues with datetime.today()
