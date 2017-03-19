@@ -2,13 +2,13 @@ import requests
 import mlbtv_session
 import mlb_exceptions
 import StorageServer
-from xbmcswift2 import Plugin
+from xbmcswift2 import Plugin, xbmcgui
 from utils import *
 import datetime
 import time
 from globals import *
+import sys
 
-cache = StorageServer.StorageServer("plugin.video.mlbbasesloaded", 24)
 plugin = Plugin()
 session = mlbtv_session.MlbTvSession()
 
@@ -40,13 +40,20 @@ def get_stream(home_team, away_team):
     identity_point_id = cookies['ipid']
     fingerprint = cookies['fprt']
 
-    session_key = cache.cacheFunction(get_session_key, identity_point_id, fingerprint, event_id, content_id)
+    try:
+        session_key = get_session_key(identity_point_id, fingerprint, event_id, content_id)
 
-    if not session_key or session_key == 'blackout':
-        raise mlb_exceptions.StreamNotFoundException()
+        if not session_key or session_key == 'blackout':
+            raise mlb_exceptions.StreamNotFoundException()
 
-    url = cache.cacheFunction(get_url, identity_point_id, fingerprint, content_id, session_key, event_id)
-    return url
+        url = get_url(identity_point_id, fingerprint, content_id, session_key, event_id)
+        return url
+    except mlb_exceptions.SignOnRestrictionException:
+        msg = "You've made too many requests to MLB.tv. Please wait some time and try again."
+        dialog = xbmcgui.Dialog()
+        ok = dialog.ok('Too many usage attempts', msg)
+        sys.exit()
+
 
 def get_url(identity_point_id, fingerprint, content_id, session_key, event_id):
     url = 'https://mlb-ws-mf.media.mlb.com/pubajaxws/bamrest/MediaService2_0/op-findUserVerifiedEvent/v-2.3'
@@ -76,6 +83,8 @@ def get_url(identity_point_id, fingerprint, content_id, session_key, event_id):
     log("API call {0}\n{1}\n{2}\n{3}".format(url, params, headers, session.get_cookies()))
     if r['status_code'] != 1:
         log(r)
+        if r['status_code'] == -3500:
+            raise mlb_exceptions.SignOnRestrictionException()
         raise mlb_exceptions.StreamNotFoundException()
     else:
         log("get_url cookies response {0}".format(s.cookies))
@@ -84,7 +93,7 @@ def get_url(identity_point_id, fingerprint, content_id, session_key, event_id):
         media_auth = s.cookies['mediaAuth']
         url = "{0}|User-Agent={1}&Cookie=mediaAuth={2}".format(base_url, UA_PS4, media_auth)
         # TODO make configurable
-        bandwidth = "3000"
+        bandwidth = "800"
         url = url.replace('master_wired60.m3u8', bandwidth+'K/'+bandwidth+'_complete.m3u8')
         return url
 
@@ -117,6 +126,10 @@ def get_session_key(identity_point_id, fingerprint, event_id, content_id):
     r = s.get(url, params=params, headers=headers).json()
     if 'session_key' not in r or not r['session_key']:
         log("Couldn't find session key: {0}".format(r))
+        if r['status_code'] == -3500:
+            raise mlb_exceptions.SignOnRestrictionException()
+        else:
+            return ''
     else:
         log("get_session_key cookies response {0}".format(s.cookies))
         session.save_cookies(s.cookies)

@@ -17,7 +17,6 @@ import mlb_exceptions
 from globals import *
 
 plugin = Plugin()
-cache = StorageServer.StorageServer("plugin.video.mlbbasesloaded", 24)
 
 @plugin.route('/')
 def index():
@@ -89,7 +88,7 @@ def play_basesloaded():
                         log("Already know stream doesn't exist for game {0}".format(game))
                         continue
 
-                    stream = cache.cacheFunction(mlbtv_stream_api.get_stream, game['state'].home_team, game['state'].away_team)
+                    stream = mlbtv_stream_api.get_stream(game['state'].home_team, game['state'].away_team)
 
                     log("Switching from {0} to {1}".format(curr_game, game))
                     curr_game = game
