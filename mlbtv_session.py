@@ -71,8 +71,17 @@ class MlbTvSession():
 
         response.close()
         """
+        settings = xbmcaddon.Addon(id='plugin.video.mlbtv')
+        username = str(settings.getSetting(id="username"))
+        password = str(settings.getSetting(id="password"))
+        if not username or not password:
+            msg = "Please set your username and password"
+            dialog = xbmcgui.Dialog()
+            ok = dialog.ok('Invalid Login', msg)
+            sys.exit()
+
         url = 'https://securea.mlb.com/authenticate.do'
-        login_data = {'password': PASSWORD, 'emailAddress': USERNAME, 'uri': '/account/login_register.jsp', 'registrationAction': 'identify'}
+        login_data = {'password': password, 'emailAddress': username, 'uri': '/account/login_register.jsp', 'registrationAction': 'identify'}
         headers = {"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
              "Accept-Encoding": "gzip, deflate",
              "Accept-Language": "en-US,en;q=0.8",

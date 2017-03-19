@@ -15,3 +15,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#100"
+msgid "Login"
+msgstr ""
+
+msgctxt "#101"
+msgid "Username"
+msgstr ""
+
+msgctxt "#102"
+msgid "Password"
+msgstr ""
