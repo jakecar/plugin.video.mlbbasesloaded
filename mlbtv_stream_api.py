@@ -41,15 +41,12 @@ def get_stream(home_team, away_team):
     identity_point_id = cookies['ipid']
     fingerprint = cookies['fprt']
 
-#     session_key = cache.cacheFunction(get_session_key, identity_point_id, fingerprint, event_id, content_id)
-    session_key = get_session_key(identity_point_id, fingerprint, event_id, content_id)
+    session_key = cache.cacheFunction(get_session_key, identity_point_id, fingerprint, event_id, content_id)
 
     if not session_key or session_key == 'blackout':
         raise mlb_exceptions.StreamNotFoundException()
 
-#     url = cache.cacheFunction(get_url, identity_point_id, fingerprint, content_id, session_key, event_id)
-    url = get_url(identity_point_id, fingerprint, content_id, session_key, event_id)
-
+    url = cache.cacheFunction(get_url, identity_point_id, fingerprint, content_id, session_key, event_id)
     return url
 
 def get_url(identity_point_id, fingerprint, content_id, session_key, event_id):
@@ -92,48 +89,6 @@ def get_url(identity_point_id, fingerprint, content_id, session_key, event_id):
         url = url.replace('master_wired60.m3u8', bandwidth+'K/'+bandwidth+'_complete.m3u8')
         return url
 
-    """
-    cj = cookielib.LWPCookieJar(os.path.join(ADDON_PATH_PROFILE, 'cookies.lwp'))
-    cj.load(os.path.join(ADDON_PATH_PROFILE, 'cookies.lwp'),ignore_discard=True)
-    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-
-    playback_scenario = 'HTTP_CLOUD_WIRED_60' # ??
-    url = 'https://mlb-ws-mf.media.mlb.com/pubajaxws/bamrest/MediaService2_0/op-findUserVerifiedEvent/v-2.3'
-    url = url + '?identityPointId='+identity_point_id
-    url = url + '&fingerprint='+fingerprint
-    url = url + '&contentId='+content_id
-    url = url + '&eventId='+event_id
-    url = url + '&playbackScenario='+playback_scenario
-    url = url + '&subject=LIVE_EVENT_COVERAGE'
-    url = url + '&sessionKey='+urllib.quote_plus(session_key)
-    url = url + '&platform=PS4'
-    url = url + '&format=json'
-    req = urllib2.Request(url)
-    req.add_header("Accept", "*/*")
-    req.add_header("Accept-Encoding", "deflate")
-    req.add_header("Accept-Language", "en-US,en;q=0.8")
-    req.add_header("Connection", "keep-alive")
-    req.add_header("User-Agent", UA_PS4)
-
-    log("API call {0}".format(req.get_full_url()))
-    response = opener.open(req)
-    json_source = json.load(response)
-    response.close()
-
-    if json_source['status_code'] != 1:
-        log(json_source)
-        raise StreamNotFoundException()
-
-    url = json_source['user_verified_event'][0]['user_verified_content'][0]['user_verified_media_item'][0]['url']
-    for cookie in cj:
-        if cookie.name == "mediaAuth":
-            media_auth = "mediaAuth="+cookie.value
-
-    cj.save(ignore_discard=True)
-    url = url + '|User-Agent='+UA_PS4+'&Cookie='+media_auth
-    return url
-    """
-
 def get_session_key(identity_point_id, fingerprint, event_id, content_id):
     url = 'https://mlb-ws-mf.media.mlb.com/pubajaxws/bamrest/MediaService2_0/op-findUserVerifiedEvent/v-2.3'
     params = {
@@ -169,40 +124,3 @@ def get_session_key(identity_point_id, fingerprint, event_id, content_id):
         session_key = r['session_key']
         log("Session key: {0}".format(session_key))
         return session_key
-
-    """
-    cj = cookielib.LWPCookieJar(os.path.join(ADDON_PATH_PROFILE, 'cookies.lwp'))
-    cj.load(os.path.join(ADDON_PATH_PROFILE, 'cookies.lwp'),ignore_discard=True)
-    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-
-    epoch_time_now = str(int(round(time.time()*1000)))
-    url = 'https://mlb-ws-mf.media.mlb.com/pubajaxws/bamrest/MediaService2_0/op-findUserVerifiedEvent/v-2.3'
-    url = url + '?identityPointId='+identity_point_id
-    url = url + '&fingerprint='+fingerprint
-    url = url + '&eventId='+event_id
-    url = url + '&subject=LIVE_EVENT_COVERAGE'
-    url = url + '&platform=WIN8'
-    url = url + '&frameworkURL=https://mlb-ws-mf.media.mlb.com&frameworkEndPoint=/pubajaxws/bamrest/MediaService2_0/op-findUserVerifiedEvent/v-2.3'
-    url = url + '&_='+epoch_time_now
-
-    req = urllib2.Request(url)
-    req.add_header("Accept", "*/*")
-    req.add_header("Accept-Encoding", "deflate")
-    req.add_header("Accept-Language", "en-US,en;q=0.8")
-    req.add_header("Connection", "keep-alive")
-    req.add_header("User-Agent", UA_PC)
-    req.add_header("Origin", "http://m.mlb.com")
-    req.add_header("Referer", "http://m.mlb.com/tv/e"+event_id+"/v"+content_id+"/?&media_type=video&clickOrigin=Media Grid&team=mlb&forwardUrl=http://m.mlb.com/tv/e"+event_id+"/v"+content_id+"/?&media_type=video&clickOrigin=Media%20Grid&team=mlb&template=mp5default&flowId=registration.dynaindex&mediaTypeTemplate=video")
-
-    log("API call {0}".format(req.get_full_url()))
-    response = opener.open(req)
-    xml_data = response.read()
-    response.close()
-
-    session_key = find(xml_data,'<session-key>','</session-key>')
-    if not session_key:
-        log("Couldn't find session key: {0}".format(xml_data))
-    else:
-        log("Session key: {0}".format(session_key))
-    return session_key
-    """

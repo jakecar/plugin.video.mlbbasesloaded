@@ -45,14 +45,6 @@ def play_basesloaded():
         plugin.notify("No current games found")
         return
 
-    # item = {
-    #     'label': 'Test video',
-    #     'path': 'http://s3.amazonaws.com/KA-youtube-converted/JwO_25S_eWE.mp4/JwO_25S_eWE.mp4',
-    #     'is_playable': True
-    # }
-    # return plugin.finish([item])
-    # plugin.set_resolved_url(item)
-
     monitor = xbmc.Monitor()
     playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
     player = mlb_player.MlbPlayer(mlb_playlist=playlist)
@@ -101,8 +93,7 @@ def play_basesloaded():
                         log("Already know stream doesn't exist for game {0}".format(game))
                         continue
 
-#                     stream = cache.cacheFunction(mlbtv_stream_api.get_stream, game['state'].home_team, game['state'].away_team)
-                    stream = mlbtv_stream_api.get_stream(game['state'].home_team, game['state'].away_team)
+                    stream = cache.cacheFunction(mlbtv_stream_api.get_stream, game['state'].home_team, game['state'].away_team)
 
                     log("Switching from {0} to {1}".format(curr_game, game))
                     curr_game = game
