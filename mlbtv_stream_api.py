@@ -7,6 +7,7 @@ import datetime
 import time
 from globals import *
 import sys
+import re
 
 plugin = Plugin()
 session = mlbtv_session.MlbTvSession()
@@ -89,12 +90,21 @@ def get_url(identity_point_id, fingerprint, content_id, session_key, event_id):
         log("get_url cookies response {0}".format(s.cookies))
         session.save_cookies(s.cookies)
         base_url = r['user_verified_event'][0]['user_verified_content'][0]['user_verified_media_item'][0]['url']
+        best_quality = _best_quality_for_stream(base_url)
+
         media_auth = s.cookies['mediaAuth']
         url = "{0}|User-Agent={1}&Cookie=mediaAuth={2}".format(base_url, UA_PS4, media_auth)
-        # TODO make configurable
-        bandwidth = "800"
-        url = url.replace('master_wired60.m3u8', bandwidth+'K/'+bandwidth+'_complete.m3u8')
+        url = url.replace('master_wired60.m3u8', "{0}K/{0}_complete.m3u8".format(best_quality))
         return url
+
+def _best_quality_for_stream(base_stream):
+    raw_result = requests.get(base_stream).text
+    lines = raw_result.split('\n')
+    lines_with_stream_quality = [line for line in lines if 'complete.m3u8' in line]
+    # Extract quality from these strings
+    # Converts e.g. [u'1800K', u'800K', u'1200K', u'2500K', u'3500K', u'5000K'] -> [1800, 800, 1200, 2500, 3500, 5000]
+    stream_qualities = [int(re.search(r'(\d.+?)K', line).group(1)) for line in lines_with_stream_quality]
+    return max(stream_qualities)
 
 def get_session_key(identity_point_id, fingerprint, event_id, content_id):
     url = 'https://mlb-ws-mf.media.mlb.com/pubajaxws/bamrest/MediaService2_0/op-findUserVerifiedEvent/v-2.3'
