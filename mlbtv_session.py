@@ -4,9 +4,7 @@ import time
 from xbmcswift2 import xbmc, xbmcaddon
 import requests
 from utils import *
-
-COOKIE_PATH = xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('profile'), 'cookies.p'))
-UA_PC = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.97 Safari/537.36'
+from globals import *
 
 class MlbTvSession():
     def __init__(self):

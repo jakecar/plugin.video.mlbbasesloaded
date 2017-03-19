@@ -6,12 +6,11 @@ from xbmcswift2 import Plugin
 from utils import *
 import datetime
 import time
+from globals import *
 
 cache = StorageServer.StorageServer("plugin.video.mlbbasesloaded", 24)
 plugin = Plugin()
 session = mlbtv_session.MlbTvSession()
-UA_PS4 = 'PS4Application libhttp/1.000 (PS4) libhttp/3.15 (PlayStation 4)'
-UA_PC = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.97 Safari/537.36'
 
 def get_stream(home_team, away_team):
     # from grid_ce.json get calendar_event_id (event_id) and id (content_id)
