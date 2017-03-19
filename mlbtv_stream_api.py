@@ -1,7 +1,7 @@
 import requests
 import mlbtv_session
 import mlb_exceptions
-from xbmcswift2 import Plugin, xbmcgui
+from xbmcswift2 import Plugin, xbmcgui, xbmcaddon
 from utils import *
 import datetime
 import time
@@ -11,6 +11,7 @@ import re
 
 plugin = Plugin()
 session = mlbtv_session.MlbTvSession()
+settings = xbmcaddon.Addon(id='plugin.video.mlbbasesloaded')
 
 def get_stream(home_team, away_team):
     # from grid_ce.json get calendar_event_id (event_id) and id (content_id)
@@ -89,6 +90,10 @@ def get_url(identity_point_id, fingerprint, content_id, session_key, event_id):
     else:
         log("get_url cookies response {0}".format(s.cookies))
         session.save_cookies(s.cookies)
+
+        # Update session_key
+        settings.setSetting(id='session_key', value=r['session_key'])
+
         base_url = r['user_verified_event'][0]['user_verified_content'][0]['user_verified_media_item'][0]['url']
         best_quality = _best_quality_for_stream(base_url)
 
@@ -107,6 +112,10 @@ def _best_quality_for_stream(base_stream):
     return max(stream_qualities)
 
 def get_session_key(identity_point_id, fingerprint, event_id, content_id):
+    session_key = str(settings.getSetting(id="session_key"))
+    if session_key:
+        return session_key
+
     url = 'https://mlb-ws-mf.media.mlb.com/pubajaxws/bamrest/MediaService2_0/op-findUserVerifiedEvent/v-2.3'
     params = {
         'identityPointId': identity_point_id,
@@ -144,4 +153,5 @@ def get_session_key(identity_point_id, fingerprint, event_id, content_id):
         session.save_cookies(s.cookies)
         session_key = r['session_key']
         log("Session key: {0}".format(session_key))
+        settings.setSetting(id='session_key', value=session_key)
         return session_key
