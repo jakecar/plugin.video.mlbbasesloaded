@@ -39,7 +39,7 @@ class MlbTvSession():
             pickle.dump(cookies, f)
 
     def _login(self):
-        settings = xbmcaddon.Addon(id='plugin.video.mlbtv')
+        settings = xbmcaddon.Addon(id='plugin.video.mlbbasesloaded')
         username = str(settings.getSetting(id="username"))
         password = str(settings.getSetting(id="password"))
         if not username or not password:
