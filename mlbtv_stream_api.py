@@ -87,6 +87,9 @@ def get_url(identity_point_id, fingerprint, content_id, session_key, event_id):
         base_url = r['user_verified_event'][0]['user_verified_content'][0]['user_verified_media_item'][0]['url']
         media_auth = s.cookies['mediaAuth']
         url = "{0}|User-Agent={1}&Cookie=mediaAuth={2}".format(base_url, UA_PS4, media_auth)
+        # TODO make configurable
+        bandwidth = "800"
+        url = url.replace('master_wired60.m3u8', bandwidth+'K/'+bandwidth+'_complete.m3u8')
         return url
 
     """
