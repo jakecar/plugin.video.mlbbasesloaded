@@ -10,12 +10,12 @@ class StaticTableLeverageIndex(object):
 
     >>> # Happy path test
     >>> index = StaticTableLeverageIndex('resources/li.csv')
-    >>> index.get(7, 'bot', ['3'], 2, 5, 5)
+    >>> index.get(7, 'bot', [u'3'], 2, 5, 5)
     2.6
     >>> # Test when run differential is outside range [-4, +4]
-    >>> index.get(7, 'bot', ['3'], 2, 1, 12) == index.get(7, 'bot', ['3'], 2, 1, 5)
+    >>> index.get(7, 'bot', [u'3'], 2, 1, 12) == index.get(7, 'bot', [u'3'], 2, 1, 5)
     True
-    >>> index.get(7, 'bot', ['3'], 2, 12, 1) == index.get(7, 'bot', ['3'], 2, 5, 1)
+    >>> index.get(7, 'bot', [u'3'], 2, 12, 1) == index.get(7, 'bot', [u'3'], 2, 5, 1)
     True
     >>> # Test no one on
     >>> index.get(7, 'bot', [], 0, 1, 1)
@@ -34,7 +34,8 @@ class StaticTableLeverageIndex(object):
         # Fields are: inning_num,inning_half,runners_on,outs,-4,-3,-2,-1,0,+1,+2,+3,+4 where "-3" means home team is down by 3
         li_table = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(list))))
         with open(li_table_filepath, 'r', encoding='utf-8') as f:
-            li_table_csv = csv.reader(f)
+            # Skip comment lines starting with '#'
+            li_table_csv = csv.reader(filter(lambda row: row[0] != '#', f))
             for row in li_table_csv:
                 _3to2list = list(row)
                 inning_num, inning_half, runners_on, outs, run_differential, = _3to2list[:4] + [_3to2list[4:]]
