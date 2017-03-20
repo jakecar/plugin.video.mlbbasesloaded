@@ -9,7 +9,7 @@ class StaticTableLeverageIndex(object):
     u""" Uses a static CSV file to compute leverage index
 
     >>> # Happy path test
-    >>> index = StaticTableLeverageIndex('resources/li.csv')
+    >>> index = StaticTableLeverageIndex(open('resources/li.csv', 'r'))
     >>> index.get(7, 'bot', [u'3'], 2, 5, 5)
     2.6
     >>> # Test when run differential is outside range [-4, +4]
@@ -24,24 +24,23 @@ class StaticTableLeverageIndex(object):
     >>> index.get(9, 'bot', [], 0, 1, 1) == index.get(12, 'bot', [], 0, 1, 1)
     True
     """
-    def __init__(self, li_table_filepath):
+    def __init__(self, li_table_csv):
         # Structure of self.li_table is:
         # self.li_table[inning_num][inning_half][runners_on][outs][run_differential] = leverage_index
         # where runners_on looks like "_ 2 _" or "_ _ _" or "1 2 _"
-        self.li_table = self._init_li_table(li_table_filepath)
+        self.li_table = self._init_li_table(li_table_csv)
 
-    def _init_li_table(self, li_table_filepath):
+    def _init_li_table(self, li_table_csv):
         # Fields are: inning_num,inning_half,runners_on,outs,-4,-3,-2,-1,0,+1,+2,+3,+4 where "-3" means home team is down by 3
         li_table = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(list))))
-        with open(li_table_filepath, 'r', encoding='utf-8') as f:
-            # Skip comment lines starting with '#'
-            li_table_csv = csv.reader(filter(lambda row: row[0] != '#', f))
-            for row in li_table_csv:
-                _3to2list = list(row)
-                inning_num, inning_half, runners_on, outs, run_differential, = _3to2list[:4] + [_3to2list[4:]]
-                # Convert each run differential key from str to float
-                run_differential = list(imap(float, run_differential))
-                li_table[int(inning_num)][inning_half][runners_on][int(outs)] = run_differential
+        # Skip comment lines starting with '#'
+        li_table_csv = csv.reader(filter(lambda row: row[0] != '#', li_table_csv))
+        for row in li_table_csv:
+            _3to2list = list(row)
+            inning_num, inning_half, runners_on, outs, run_differential, = _3to2list[:4] + [_3to2list[4:]]
+            # Convert each run differential key from str to float
+            run_differential = list(imap(float, run_differential))
+            li_table[int(inning_num)][inning_half][runners_on][int(outs)] = run_differential
         return li_table
 
     def get(self, inning_num, inning_half, runners_on, num_outs, away_score, home_score):

@@ -21,11 +21,11 @@ def index():
 def play_basesloaded():
     import get_scores
 
-    li_csv_path =  plugin.addon.getAddonInfo('path') + "/resources/li.csv"
     # TODO be weary of timezone issues with datetime.today()
     # also, need a way of checking if there are any current games, not just
     # games that are currently *on*
-    games = get_scores.best_games(datetime.datetime.today(), li_csv_path)
+    li_csv_f = open(LI_CSV_PATH, 'r')
+    games = get_scores.best_games(datetime.datetime.today(), li_csv_f)
     if games is None:
         plugin.notify("No games on")
         return
@@ -47,7 +47,7 @@ def play_basesloaded():
         # TODO be weary of timezone issues with datetime.today()
         # TODO encapsulate all this logic in an object
         games = future_best_games
-        future_best_games = get_scores.best_games(datetime.datetime.today(), li_csv_path)
+        future_best_games = get_scores.best_games(datetime.datetime.today(), li_csv_f)
         if not games:
             # TODO better UX for this situation
             log("No game found")

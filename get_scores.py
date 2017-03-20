@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from collections import namedtuple
 import requests
+import leverage_index
 
 GameState = namedtuple(u'GameState',
     [u'inning_num',
@@ -88,8 +89,6 @@ def convert_inning_half(inning_state):
         return inning_state
 
 def best_games(date, leverage_index_csv):
-    import leverage_index
-
     index_table = leverage_index.StaticTableLeverageIndex(leverage_index_csv)
     games = get_games(date)
     leverage_indices = [{
