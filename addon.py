@@ -27,7 +27,7 @@ def play_basesloaded():
     # games that are currently *on*
     games = get_scores.best_games(datetime.datetime.today(), li_csv_path)
     if games is None:
-        plugin.notify("No current games found")
+        plugin.notify("No games on")
         return
 
     monitor = xbmc.Monitor()
