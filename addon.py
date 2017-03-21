@@ -98,7 +98,7 @@ def play_basesloaded():
                 log("Stream not found for {0}. Setting cache to {1}".format(game, streams_not_found))
                 continue
 
-        # NOTE there's a bug where if you play some other video after stopping this one within 20 seconds you'll get fucked
+        # NOTE there's a bug where if you play some other video after stopping this one within 20 seconds you'll get in trouble
         if monitor.waitForAbort(20.0) or not player.isPlayingVideo():
             break
 
