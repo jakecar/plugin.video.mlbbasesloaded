@@ -12,7 +12,14 @@
   <extension point="xbmc.addon.metadata">
     <platform>all</platform>
     <language></language>
-    <summary>Summary for "MLBBasesLoaded"</summary>
-    <description>Description for "MLBBasesLoaded"</description>
+    <summary>Redzone for MLB.tv</summary>
+    <description>Automatically shows you the best MLB game on. It will switch games at commercial breaks and will cut to a different game if it's significantly better than the current game.</description>
   </extension>
+
+  <news>v0.1  (2017-03-20)
+    - Initial version.
+  </news>
+
+  <license>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</license>
+  <source>http://github.com/jakecar/plugin.video.mlbbasesloaded</source>
 </addon>
