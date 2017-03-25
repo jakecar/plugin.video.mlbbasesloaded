@@ -73,7 +73,13 @@ def play_basesloaded():
                 # Only switch games if:
                 #  curr_game is None (either no curr_game or it's in commercial break)
                 #  The change in leverage is > 1.5 and there's a new batter in curr_game
-                if curr_game is None or ((game['leverage_index'] - curr_game['leverage_index'] > 1.5) and curr_game['state'].new_batter):
+                #  game has a better leverage than curr_game and curr_game is below average leverage (1.0) and there's a new batter in curr_game
+                curr_game_none = curr_game is None
+                new_batter = curr_game and curr_game['state'].new_batter
+                large_leverage_diff = curr_game and (game['leverage_index'] - curr_game['leverage_index'] > 1.5)
+                game_better = curr_game and game['leverage_index'] > curr_game['leverage_index']
+                curr_game_below_avg = curr_game and curr_game['leverage_index'] < 1.0
+                if curr_game_none or (new_batter and (large_leverage_diff or (curr_game_below_avg and game_better))):
                     if (game['state'].home_team, game['state'].away_team) in streams_not_found:
                         log("Already know stream doesn't exist for game {0}".format(game))
                         continue
