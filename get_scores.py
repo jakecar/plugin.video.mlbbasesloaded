@@ -15,8 +15,6 @@ GameState = namedtuple(u'GameState',
      u'balls',
      u'strikes'])
 
-# NOTE Data seems to be about 20 seconds ahead of MLB.tv
-# TODO handle this
 def get_games(date):
     scoreboard_url = u'http://gd2.mlb.com/components/game/mlb/{0}/master_scoreboard.json'.format(date.strftime(u'year_%Y/month_%m/day_%d'))
     scoreboard = requests.get(scoreboard_url).json()

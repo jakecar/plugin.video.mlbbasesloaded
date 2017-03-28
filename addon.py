@@ -1,11 +1,11 @@
 from xbmcswift2 import Plugin
 from xbmcswift2 import xbmc
 import mlb_player
-import datetime
 import mlbtv_stream_api
 from utils import *
 import mlb_exceptions
 from globals import *
+from mlb_games_queue import MlbGamesQueue
 
 plugin = Plugin()
 
@@ -19,13 +19,13 @@ def index():
 
 @plugin.route('/basesloaded')
 def play_basesloaded():
-    import get_scores
+    delay_sec = 20
+    refresh_sec = 10
+    games_queue = MlbGamesQueue(delay_sec, refresh_sec, plugin)
 
-    li_csv_path =  plugin.addon.getAddonInfo('path') + "/resources/li.csv"
-    # TODO be weary of timezone issues with datetime.today()
-    # also, need a way of checking if there are any current games, not just
+    # Need a way of checking if there are any current games, not just
     # games that are currently *on*
-    games = get_scores.best_games(datetime.datetime.today(), li_csv_path)
+    games = games_queue.get()
     if games is None:
         plugin.notify("No games on")
         return
@@ -36,18 +36,8 @@ def play_basesloaded():
 
     curr_game = None
     streams_not_found = set([])
-    # Since MLB API is ~20 seconds in the future of MLB.tv,
-    # we'll store the API result and use in the next 20 sec
-    # iteration.
-    # TODO hit API every 10 seconds, then keep a history array
-    # and figure out what actual MLB.tv delay is (via experimentation)
-    # and make sure to index back in time to the history array
-    future_best_games = games
     while True:
-        # TODO be weary of timezone issues with datetime.today()
         # TODO encapsulate all this logic in an object
-        games = future_best_games
-        future_best_games = get_scores.best_games(datetime.datetime.today(), li_csv_path)
         if not games:
             # TODO better UX for this situation
             log("No game found")
@@ -105,8 +95,11 @@ def play_basesloaded():
                 continue
 
         # NOTE there's a bug where if you play some other video after stopping this one within 20 seconds you'll get in trouble
-        if monitor.waitForAbort(20.0) or not player.isPlayingVideo():
+        if monitor.waitForAbort(refresh_sec) or not player.isPlayingVideo():
             break
+
+        # Update games
+        games = games_queue.get()
 
 if __name__ == '__main__':
     plugin.run()
