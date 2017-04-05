@@ -26,6 +26,7 @@ def play_basesloaded():
 
     # Need a way of checking if there are any current games, not just
     # games that are currently *on*
+    # Maybe display to user: "There are N games on right now"
     games = games_queue.get()
     if games is None:
         plugin.notify("No games on")
