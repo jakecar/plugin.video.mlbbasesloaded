@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.mlbbasesloaded" name="MLB BasesLoaded" version="0.1" provider-name="Jake Kramer">
+<addon id="plugin.video.mlbbasesloaded" name="MLB BasesLoaded" version="0.2" provider-name="Jake Kramer">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
     <import addon="script.module.xbmcswift2" version="2.4.0"/>
@@ -15,8 +15,12 @@
     <description>Automatically shows you the best MLB game on. It will switch games at commercial breaks and will cut to a different game if it's significantly better than the current game.</description>
   </extension>
 
-  <news>v0.1  (2017-03-27)
+  <news>
+    v0.1  (2017-03-27)
     - Initial version.
+
+    v0.2  (2017-04-04)
+    - Better synchronization between MLB.tv data and the stream.
   </news>
 
   <license>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</license>
