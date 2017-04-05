@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from collections import namedtuple
 import requests
+from xbmcswift2 import xbmc
 
 GameState = namedtuple(u'GameState',
     [u'inning_num',
@@ -95,10 +96,10 @@ def best_games(date, leverage_index_csv):
                             "state": game
                         } for game in games]
     if len(leverage_indices) == 0:
-        print u"plugin.video.mlbbasesloaded: No games"
+        xbmc.log("No games")
         return None
     else:
         best_games = sorted(leverage_indices, key=lambda x: x['leverage_index'], reverse=True)
-        print best_games
-        print u"plugin.video.mlbbasesloaded: Best game is {0}".format(best_games[0])
+        xbmc.log("{0}".format(best_games))
+        xbmc.log("Best game is {0}".format(best_games[0]))
         return best_games

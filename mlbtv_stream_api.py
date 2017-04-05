@@ -1,8 +1,7 @@
 import requests
 import mlbtv_session
 import mlb_exceptions
-from xbmcswift2 import Plugin, xbmcgui, xbmcaddon
-from utils import *
+from xbmcswift2 import Plugin, xbmcgui, xbmcaddon, xbmc
 import datetime
 import time
 from globals import *
@@ -81,14 +80,14 @@ def get_url(identity_point_id, fingerprint, content_id, session_key, event_id):
     s = requests.Session()
     s.cookies = session.get_cookies()
     r = s.get(url, params=params, headers=headers).json()
-    log("API call {0}\n{1}\n{2}\n{3}".format(url, params, headers, session.get_cookies()))
+    xbmc.log("API call {0}\n{1}\n{2}\n{3}".format(url, params, headers, session.get_cookies()))
     if r['status_code'] != 1:
-        log(r)
+        xbmc.log("{0}".format(r))
         if r['status_code'] == -3500:
             raise mlb_exceptions.SignOnRestrictionException()
         raise mlb_exceptions.StreamNotFoundException()
     else:
-        log("get_url cookies response {0}".format(s.cookies))
+        xbmc.log("get_url cookies response {0}".format(s.cookies))
         session.save_cookies(s.cookies)
 
         # Update session_key
@@ -138,20 +137,20 @@ def get_session_key(identity_point_id, fingerprint, event_id, content_id):
         'Referer': 'http://m.mlb.com/tv/e{0}/v{1}/?&media_type=video&clickOrigin=Media Grid&team=mlb&forwardUrl=http://m.mlb.com/tv/e{0}/v{1}/?&media_type=video&clickOrigin=Media%20Grid&team=mlb&template=mp5default&flowId=registration.dynaindex&mediaTypeTemplate=video'.format(event_id, content_id)
     }
 
-    log("API call {0}\n{1}\n{2}\n{3}".format(url, params, headers, session.get_cookies()))
+    xbmc.log("API call {0}\n{1}\n{2}\n{3}".format(url, params, headers, session.get_cookies()))
     s = requests.Session()
     s.cookies = session.get_cookies()
     r = s.get(url, params=params, headers=headers).json()
     if 'session_key' not in r or not r['session_key']:
-        log("Couldn't find session key: {0}".format(r))
+        xbmc.log("Couldn't find session key: {0}".format(r))
         if r['status_code'] == -3500:
             raise mlb_exceptions.SignOnRestrictionException()
         else:
             return ''
     else:
-        log("get_session_key cookies response {0}".format(s.cookies))
+        xbmc.log("get_session_key cookies response {0}".format(s.cookies))
         session.save_cookies(s.cookies)
         session_key = r['session_key']
-        log("Session key: {0}".format(session_key))
+        xbmc.log("Session key: {0}".format(session_key))
         settings.setSetting(id='session_key', value=session_key)
         return session_key

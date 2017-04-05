@@ -7,12 +7,9 @@ class MlbPlayer(xbmc.Player):
         self.mlb_playlist = kwargs['mlb_playlist']
         self.curr_playing = ''
 
-    # TODO not sure this works. i see 2 different threads
-    # making API calls when I stop video then restart plugin
     def onPlayBackStopped(self):
         self.mlb_playlist.clear()
         self.stop()
-        print "onPlayBackStopped exiting"
         xbmc.executebuiltin('StopScript(%d)' % int(sys.argv[1]))
 
     def play_video(self, stream):

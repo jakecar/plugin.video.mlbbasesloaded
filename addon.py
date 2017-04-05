@@ -2,7 +2,6 @@ from xbmcswift2 import Plugin
 from xbmcswift2 import xbmc
 import mlb_player
 import mlbtv_stream_api
-from utils import *
 import mlb_exceptions
 from globals import *
 from mlb_games_queue import MlbGamesQueue
@@ -42,7 +41,7 @@ def play_basesloaded():
         # TODO encapsulate all this logic in an object
         if not games:
             # TODO better UX for this situation
-            log("No game found")
+            xbmc.log("No game found")
             xbmc.sleep(5000)
             continue
 
@@ -58,7 +57,7 @@ def play_basesloaded():
         # Iterate through best games in order, choosing first one a stream exists for
         for game in games:
             if curr_game == game:
-                log("Not switching because current game is still best game")
+                xbmc.log("Not switching because current game is still best game")
                 break
 
             try:
@@ -73,27 +72,27 @@ def play_basesloaded():
                 curr_game_below_avg = curr_game and curr_game['leverage_index'] < 1.0
                 if curr_game_none or (new_batter and (large_leverage_diff or (curr_game_below_avg and game_better))):
                     if (game['state'].home_team, game['state'].away_team) in streams_not_found:
-                        log("Already know stream doesn't exist for game {0}".format(game))
+                        xbmc.log("Already know stream doesn't exist for game {0}".format(game))
                         continue
 
                     stream = mlbtv_stream_api.get_stream(game['state'].home_team, game['state'].away_team)
 
-                    log("Switching from {0} to {1}".format(curr_game, game))
+                    xbmc.log("Switching from {0} to {1}".format(curr_game, game))
                     curr_game = game
-                    log("stream: " + stream)
+                    xbmc.log("stream: " + stream)
                     player.play_video(stream)
 
                 if curr_game == game:
-                    log("Current game is in commercial break or is over")
+                    xbmc.log("Current game is in commercial break or is over")
                 if curr_game != game and (game['leverage_index'] - curr_game['leverage_index']) <= 1.5:
-                    log("{0} is better game, but not enough better to switch from {1}".format(game, curr_game))
+                    xbmc.log("{0} is better game, but not enough better to switch from {1}".format(game, curr_game))
                 elif curr_game != game and (game['leverage_index'] - curr_game['leverage_index']) > 1.5:
-                    log("{0} is a better game, but {1} still has a batter at the plate".format(game, curr_game))
+                    xbmc.log("{0} is a better game, but {1} still has a batter at the plate".format(game, curr_game))
 
                 break
             except mlb_exceptions.StreamNotFoundException:
                 streams_not_found.add((game['state'].home_team, game['state'].away_team),)
-                log("Stream not found for {0}. Setting cache to {1}".format(game, streams_not_found))
+                xbmc.log("Stream not found for {0}. Setting cache to {1}".format(game, streams_not_found))
                 continue
 
         if monitor.waitForAbort(refresh_sec) or not player.isPlayingVideo():

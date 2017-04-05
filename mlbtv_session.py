@@ -3,7 +3,6 @@ import pickle
 import time
 from xbmcswift2 import xbmcaddon, xbmcgui
 import requests
-from utils import *
 from globals import *
 import sys
 
@@ -66,5 +65,5 @@ class MlbTvSession():
             ok = dialog.ok('Invalid Login', msg)
             sys.exit()
         else:
-            log("_login cookies response {0}".format(session.cookies))
+            xbmc.log("_login cookies response {0}".format(session.cookies))
             self._write_cookies(session.cookies)
