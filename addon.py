@@ -6,6 +6,7 @@ from utils import *
 import mlb_exceptions
 from globals import *
 from mlb_games_queue import MlbGamesQueue
+import sys
 
 plugin = Plugin()
 
@@ -94,9 +95,8 @@ def play_basesloaded():
                 log("Stream not found for {0}. Setting cache to {1}".format(game, streams_not_found))
                 continue
 
-        # NOTE there's a bug where if you play some other video after stopping this one within 20 seconds you'll get in trouble
         if monitor.waitForAbort(refresh_sec) or not player.isPlayingVideo():
-            break
+            sys.exit()
 
         # Update games
         games = games_queue.get()
